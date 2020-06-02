@@ -87,46 +87,21 @@ public class AsyncServer extends HttpServlet {
 		}else if(act.equals("create_match")){
 			//For test, create a match with 1deck and 2 people
 			String user_id=request.getParameter("user_id");
-			Matches.createMatch(new Rule(1,1,0,true), Integer.parseInt(user_id));
+			int s=Matches.createMatch(new Rule(1,1,0,true), Integer.parseInt(user_id));
 			AsyncContext asyncContext=request.startAsync();
-			asyncContext.setTimeout(5000);
-			asyncContext.addListener(new AsyncListenerAdapter(){
-				@Override
-				public void onTimeout(AsyncEvent arg0) {
-					try {
-						PrintWriter pw= asyncContext.getResponse().getWriter();
-						pw.println("Pooling");
-						pw.print(Matches.getMatch(Integer.parseInt(match_id)));
-						asyncContext.complete();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			});
+			PrintWriter pw=asyncContext.getResponse().getWriter();
+			pw.println("OK");
+			pw.print(s);
 			try {
-				PlayerSessions.refresh(Integer.parseInt(user_id), asyncContext);
-				if(Matches.gotEnoughPlayers(Integer.parseInt(match_id))==true) {
-					List<Integer> l=Matches.getPlayerIds(Integer.parseInt(match_id));
-					for(int i=0;i<l.size();i++) {
-						PrintWriter pw=PlayerSessions.getContext(l.get(i)).getResponse().getWriter();
-						pw.println("OK");
-						pw.print(Base64.getEncoder().encode(Matches.sendHands(Integer.parseInt(match_id),i)));
-						PlayerSessions.getContext(l.get(i)).complete();
-					}
-				}
-			} catch (NumberFormatException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (NoCorrespondingContextException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (MultipleContextException e) {
+				PlayerSessions.addNewContext(Integer.parseInt(user_id), asyncContext);
+			} catch (NumberFormatException | MultipleContextException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-		}else if(act.equals("Pooling")) {
+			pw.print(Matches.getMatch(s));
+			asyncContext.complete();
+			pw.close();
+		}else if(act.equals("Spooling")) {
 			String user_id=request.getParameter("user_id");
 			String match_id=request.getParameter("match_id");
 			AsyncContext asyncContext=request.startAsync();
@@ -136,7 +111,7 @@ public class AsyncServer extends HttpServlet {
 				public void onTimeout(AsyncEvent arg0) {
 					try {
 						PrintWriter pw= asyncContext.getResponse().getWriter();
-						pw.println("Pooling");
+						pw.println("Spooling");
 						pw.print(Matches.getMatch(Integer.parseInt(match_id)));
 						asyncContext.complete();
 					} catch (IOException e) {

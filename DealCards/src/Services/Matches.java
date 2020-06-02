@@ -17,9 +17,11 @@ import exceptions.MatchNoFoundException;
 public class Matches {
 	private final static ConcurrentMap<Integer,Match> matchList=new ConcurrentHashMap<Integer,Match>();
 	private final static AtomicLong ID=new AtomicLong(0);
-	public static void createMatch(Rule rule,int user_id) {
-		matchList.put(ID.intValue(),new Match(ID.intValue(),rule,user_id));
+	public static int createMatch(Rule rule,int user_id) {
+		Match ret=new Match(ID.intValue(),rule,user_id);
+		matchList.put(ID.intValue(),ret);
 		ID.incrementAndGet();
+		return ret.getMatch_id();
 	}
 	public static Match getMatch(int match_id) {
 		return matchList.get(match_id);
@@ -80,6 +82,9 @@ class Match{
 			throw new MatchFullException();
 		}
 		Player_ids.add(user_id);
+	}
+	public int getMatch_id() {
+		return Match_id;
 	}
 	public boolean gotEnoughPlayers() {
 		return Player_ids.size()==Player_count;
