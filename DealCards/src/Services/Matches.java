@@ -35,15 +35,16 @@ public class Matches {
 		s.joinMatch(user_id);
 	}
 	public static boolean gotEnoughPlayers(int match_id) {
+		System.out.println(match_id);
 		return matchList.get(match_id).gotEnoughPlayers();
 	}
 	public static byte[] sendHands(int match_id,int i) {
 		return matchList.get(match_id).sendHands(i);
 	}
 	public static byte[]  listGame() {
-		List<Match> l=new ArrayList<Match>();
+		List<String> l=new ArrayList<String>();
 		for(Map.Entry<Integer, Match> entry:matchList.entrySet()) {
-			l.add(entry.getValue());
+			l.add(entry.getValue().toString());
 		}
 		byte[] ret=null;
 		try {

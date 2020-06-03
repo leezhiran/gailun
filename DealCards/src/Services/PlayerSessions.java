@@ -21,8 +21,8 @@ public class PlayerSessions {
 	 * @throws MultipleContextException When key conflicts.
 	 * */
 	static public void addNewContext(Integer user_id,AsyncContext asyncContext) throws MultipleContextException {
-		
-		if(sessions.put(user_id,asyncContext)==null) {
+		sessions.put(user_id,asyncContext);
+		if(false) {
 			throw new MultipleContextException();
 		}
 	}
@@ -46,8 +46,10 @@ public class PlayerSessions {
 	 * @throws MultipleContextException When key conflicts.
 	 * */
 	static public void refresh(Integer user_id,AsyncContext asyncContext) throws NoCorrespondingContextException, MultipleContextException {
-		delContext(user_id);
-		addNewContext(user_id,asyncContext);
+		//delContext(user_id);
+		//addNewContext(user_id,asyncContext);
+		sessions.replace(user_id, asyncContext);
+		sessions.get(0);
 	}
 	/**
 	 * Get {@code AsyncContext} from the mapping.

@@ -24,6 +24,12 @@ public class ConnectionTools {
 		return c;
 	}
 	public static List<String> doAction(Map<String,String> args) {
+		try {
+			getConnection();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		List<String> ret1=new ArrayList<String>();
 		String ret=new String();
 		for(Map.Entry<String,String> i:args.entrySet()) {
@@ -48,6 +54,7 @@ public class ConnectionTools {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		args.clear();
 		return ret1;
 	}
 }

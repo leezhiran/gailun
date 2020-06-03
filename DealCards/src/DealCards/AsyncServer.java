@@ -87,11 +87,11 @@ public class AsyncServer extends HttpServlet {
 		}else if(act.equals("create_match")){
 			//For test, create a match with 1deck and 2 people
 			String user_id=request.getParameter("user_id");
-			int s=Matches.createMatch(new Rule(1,1,0,true), Integer.parseInt(user_id));
+			int s=Matches.createMatch(new Rule(1,2,0,true), Integer.parseInt(user_id));
 			AsyncContext asyncContext=request.startAsync();
 			PrintWriter pw=asyncContext.getResponse().getWriter();
 			pw.println("OK");
-			pw.print(s);
+			pw.println(s);
 			try {
 				PlayerSessions.addNewContext(Integer.parseInt(user_id), asyncContext);
 			} catch (NumberFormatException | MultipleContextException e) {
@@ -127,7 +127,8 @@ public class AsyncServer extends HttpServlet {
 					for(int i=0;i<l.size();i++) {
 						PrintWriter pw=PlayerSessions.getContext(l.get(i)).getResponse().getWriter();
 						pw.println("OK");
-						pw.print(Base64.getEncoder().encode(Matches.sendHands(Integer.parseInt(match_id),i)));
+						String s=new String(Base64.getEncoder().encode(Matches.sendHands(Integer.parseInt(match_id),i)),"utf-8").replace("\r\n", "");
+						pw.println(s);
 						PlayerSessions.getContext(l.get(i)).complete();
 					}
 				}
