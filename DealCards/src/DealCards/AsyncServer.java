@@ -2,6 +2,7 @@ package DealCards;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.util.Base64;
 import java.util.List;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import ChatRoom.ChatRoom;
 import Services.AsyncListenerAdapter;
 import Services.Matches;
 import Services.PlayerSessions;
@@ -31,7 +33,7 @@ import exceptions.NoCorrespondingContextException;
 @WebServlet(urlPatterns="/AsyncServer",asyncSupported=true)
 public class AsyncServer extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-    public static final AtomicLong ID=new AtomicLong(0);
+    public static final AtomicLong ID=new AtomicLong(1);
     public static final PlayerSessions playerSessions=new PlayerSessions();
     /**
      * @see HttpServlet#HttpServlet()
@@ -45,12 +47,14 @@ public class AsyncServer extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
+    // ¿ΩÁ∆µµ¿0
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String act=request.getParameter("Action");
 		if(act.equals("log_in")) {
 			int id=(int)ID.get();
 			Players.logIn(id);
 			PrintWriter pw=response.getWriter();
+			ChatRoom.joinChatRoom(id,0);
 			pw.println("OK");
 			pw.print(id);
 			ID.incrementAndGet();
@@ -65,6 +69,7 @@ public class AsyncServer extends HttpServlet {
 			try {
 				Matches.joinGame(Integer.parseInt(match_id), Integer.parseInt(user_id));
 				PrintWriter pw=response.getWriter();
+				ChatRoom.joinChatRoom( Integer.parseInt(user_id),Integer.parseInt(match_id));
 				pw.println("OK");
 				AsyncContext asyncContext=request.startAsync();
 				playerSessions.addNewContext(Integer.parseInt(user_id), asyncContext);
@@ -92,6 +97,8 @@ public class AsyncServer extends HttpServlet {
 			int s=Matches.createMatch(new Rule(1,2,0,true), Integer.parseInt(user_id));
 			AsyncContext asyncContext=request.startAsync();
 			PrintWriter pw=asyncContext.getResponse().getWriter();
+			ChatRoom.newChatRoom(s);
+			ChatRoom.joinChatRoom(Integer.parseInt(user_id),s);
 			pw.println("OK");
 			pw.println(s);
 			try {
@@ -107,44 +114,8 @@ public class AsyncServer extends HttpServlet {
 			String user_id=request.getParameter("user_id");
 			String match_id=request.getParameter("match_id");
 			AsyncContext asyncContext=request.startAsync();
-			asyncContext.setTimeout(5000);
-			asyncContext.addListener(new AsyncListenerAdapter(){
-				@Override
-				public void onTimeout(AsyncEvent arg0) {
-					try {
-						PrintWriter pw= asyncContext.getResponse().getWriter();
-						pw.println("Spooling");
-						pw.print(Matches.getMatch(Integer.parseInt(match_id)));
-						asyncContext.complete();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			});
-			try {
-				playerSessions.refresh(Integer.parseInt(user_id), asyncContext);
-				if(Matches.gotEnoughPlayers(Integer.parseInt(match_id))==true) {
-					List<Integer> l=Matches.getPlayerIds(Integer.parseInt(match_id));
-					for(int i=0;i<l.size();i++) {
-						PrintWriter pw=playerSessions.getContext(l.get(i)).getResponse().getWriter();
-						pw.println("OK");
-						String s=new String(Base64.getEncoder().encode(Matches.sendHands(Integer.parseInt(match_id),i)),"utf-8").replace("\r\n", "");
-						pw.println(s);
-						playerSessions.getContext(l.get(i)).complete();
-					}
-				}
-			} catch (NumberFormatException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (NoCorrespondingContextException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (MultipleContextException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
+			asyncContextInitialize(5000,match_id,asyncContext);
+			mainTainSessions(user_id,match_id,asyncContext);
 		}		
 	}
 
@@ -155,5 +126,51 @@ public class AsyncServer extends HttpServlet {
 		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
-
+	public void mainTainSessions(String user_id,String match_id,AsyncContext asyncContext) {
+		try {
+			playerSessions.refresh(Integer.parseInt(user_id), asyncContext);
+			if(Matches.gotEnoughPlayers(Integer.parseInt(match_id))==true) {
+				List<Integer> l=Matches.getPlayerIds(Integer.parseInt(match_id));
+				for(int i=0;i<l.size();i++) {
+					PrintWriter pw=playerSessions.getContext(l.get(i)).getResponse().getWriter();
+					pw.println("OK");
+					String s=new String(Base64.getEncoder().encode(Matches.sendHands(Integer.parseInt(match_id),i)),"utf-8").replace("\r\n", "");
+					pw.println(s);
+					playerSessions.getContext(l.get(i)).complete();
+				}
+			}
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoCorrespondingContextException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MultipleContextException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public static void asyncContextInitialize(int timeoutMilli,String match_id,AsyncContext asyncContext) {
+		asyncContext.setTimeout(5000);
+		asyncContext.addListener(new AsyncListenerAdapter(){
+			@Override
+			public void onTimeout(AsyncEvent arg0) {
+				try {
+					PrintWriter pw= asyncContext.getResponse().getWriter();
+					pw.println("Spooling");
+					pw.print(Matches.getMatch(Integer.parseInt(match_id)));
+					asyncContext.complete();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+	}
 }

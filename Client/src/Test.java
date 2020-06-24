@@ -20,6 +20,7 @@ import Services.Deck;
 public class Test {
 
 	public static void main(String[] args) {
+		/*
 		Scanner scanner = new Scanner(System.in);
 		int i = scanner.nextInt();
 		if (i == 0) {
@@ -72,11 +73,7 @@ public class Test {
 			int user_id = -1;
 			int match_id = -1;
 			Deck[] hand;
-			netArgs.put("Action", "log_in");
-			netRet = ConnectionTools.doAction(netArgs);
-			if (netRet.get(0).equals("OK")) {
-				user_id = Integer.parseInt(netRet.get(1));
-			}
+			
 			netRet.clear();
 			netArgs.put("Action", "list_match");
 			netRet = ConnectionTools.doAction(netArgs);
@@ -132,7 +129,33 @@ public class Test {
 				}
 				netRet.clear();
 			}
+		}*/
+		Map<String,String> netArgs=new HashMap<String,String>();
+		netArgs.put("Action", "log_in");
+		List<String>netRet = ConnectionTools.doAction(netArgs,"AsyncServer");
+		final int user_id;
+		user_id = Integer.parseInt(netRet.get(1));
+		new Thread(()-> {
+			while(true) {
+				Map<String, String> netArgs1 = new HashMap<String, String>();
+				netArgs1.put("Action","Spooling");
+				netArgs1.put("match_id","0");
+				netArgs1.put("user_id",String.valueOf(user_id));
+				List<String>ret =ConnectionTools.doAction(netArgs1,"ChatRoomServer");
+				for(String i:ret) {
+					System.out.println(i);
+				}
+			}
+		}).start();
+		Scanner scanner = new Scanner(System.in);
+		while(true) {
+			Map<String, String> netArgs2 = new HashMap<String, String>();
+			String i = scanner.next();
+			netArgs2.put("Action","Broadcast");
+			netArgs2.put("match_id","0");
+			netArgs2.put("user_id",String.valueOf(user_id));
+			netArgs2.put("content","testing");
+			List<String>ret =ConnectionTools.doAction(netArgs,"ChatRoomServer");
 		}
-
 	}
 }

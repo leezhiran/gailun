@@ -11,21 +11,22 @@ import java.util.List;
 import java.util.Map;
 
 public class ConnectionTools {
-	private static final String addr="http://localhost:8080/DealCards/AsyncServer";
+	private static final String addr="http://localhost:8080/DealCards/";
 	private static HttpURLConnection connection=null;
-	public static HttpURLConnection getConnection() throws MalformedURLException, IOException {
-		HttpURLConnection c=(HttpURLConnection)new URL(addr).openConnection();
+	public static HttpURLConnection getConnection(String target) throws MalformedURLException, IOException {
+		HttpURLConnection c=(HttpURLConnection)new URL(addr+target).openConnection();
 		c.setDoOutput(true);
 		c.setDoInput(true);
-		c.setRequestMethod("POST");
+		c.setRequestMethod("GET");
 		c.setUseCaches(false); 
 		c.connect();
 		connection=c;
 		return c;
 	}
-	public static List<String> doAction(Map<String,String> args) {
+	
+	public static List<String> doAction(Map<String,String> args,String target) {
 		try {
-			getConnection();
+			getConnection(target);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -57,4 +58,5 @@ public class ConnectionTools {
 		args.clear();
 		return ret1;
 	}
+	
 }

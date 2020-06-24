@@ -1,4 +1,4 @@
-package chatRoom;
+package ChatRoom;
 
 import java.io.IOException;
 import java.util.List;
@@ -12,20 +12,21 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import DealCards.AsyncServer;
 import Services.PlayerSessions;
 
 /**
  * Servlet implementation class chatRoomServer
  */
-@WebServlet(urlPatterns="/chatRoomServer",asyncSupported=true)
-public class chatRoomServer extends HttpServlet {
+@WebServlet(urlPatterns="/ChatRoomServer",asyncSupported=true)
+public class ChatRoomServer extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     private static final PlayerSessions playSessions=new PlayerSessions();
-    private static final ConcurrentMap<Integer,ChatRoom> chatRoomMapping=new ConcurrentHashMap<Integer,ChatRoom>();
+
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public chatRoomServer() {
+    public ChatRoomServer() {
         super();
         
         // TODO Auto-generated constructor stub
@@ -36,9 +37,15 @@ public class chatRoomServer extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String action=request.getParameter("Action");
+		String match_id=request.getParameter("match_id");
 		if(action.equals("Spooling")) {
-		int uid=Integer.parseInt(request.getParameter("user_id"));
 		AsyncContext asyncContext=request.startAsync();
+		AsyncServer.asyncContextInitialize(5000,match_id,asyncContext);
+		}else if(action.equals("Broadcast")){
+			match_id=String.valueOf(match_id);
+			String user_id=request.getParameter("user_id");
+			String s=user_id+":"+request.getParameter("content");
+			ChatRoom.broadcast(playSessions,s, match_id);
 		}
 	}
 
@@ -49,5 +56,5 @@ public class chatRoomServer extends HttpServlet {
 		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
-
+	
 }
