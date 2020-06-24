@@ -17,7 +17,7 @@ public class ConnectionTools {
 		HttpURLConnection c=(HttpURLConnection)new URL(addr).openConnection();
 		c.setDoOutput(true);
 		c.setDoInput(true);
-		c.setRequestMethod("GET");
+		c.setRequestMethod("POST");
 		c.setUseCaches(false); 
 		c.connect();
 		connection=c;

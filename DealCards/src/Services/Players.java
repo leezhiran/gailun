@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import exceptions.MatchFullException;
+import exceptions.MatchNoFoundException;
+
 public class Players {
 	static private final ConcurrentMap<Integer,Player> playerMapping=new ConcurrentHashMap<Integer,Player>();
 	static public void logIn(int user_id) {
@@ -13,17 +16,7 @@ public class Players {
 	static public void logout(int user_id) {
 		playerMapping.remove(user_id);
 	}
-}
-class Player{
-	int user_id;
-	//String user_nickname;
-	boolean inGame;
-	public Player(int user_id) {
-
-		this.user_id=user_id;
-		this.inGame=false;
-	}
-	public void createGame(Rule rule) {
-		//Matches.createGame(rule);
+	static public Player getPlayer(int user_id) {
+		return playerMapping.get(user_id);
 	}
 }

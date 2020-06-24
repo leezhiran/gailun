@@ -32,12 +32,14 @@ import exceptions.NoCorrespondingContextException;
 public class AsyncServer extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     public static final AtomicLong ID=new AtomicLong(0);
+    public static final PlayerSessions playerSessions=new PlayerSessions();
     /**
      * @see HttpServlet#HttpServlet()
      */
     public AsyncServer() {
         super();
         // TODO Auto-generated constructor stub
+        
     }
 
 	/**
@@ -65,7 +67,7 @@ public class AsyncServer extends HttpServlet {
 				PrintWriter pw=response.getWriter();
 				pw.println("OK");
 				AsyncContext asyncContext=request.startAsync();
-				PlayerSessions.addNewContext(Integer.parseInt(user_id), asyncContext);
+				playerSessions.addNewContext(Integer.parseInt(user_id), asyncContext);
 				pw.print(Matches.getMatch(Integer.parseInt(match_id)));
 				asyncContext.complete();
 			}catch(MatchNoFoundException me) {
@@ -93,7 +95,7 @@ public class AsyncServer extends HttpServlet {
 			pw.println("OK");
 			pw.println(s);
 			try {
-				PlayerSessions.addNewContext(Integer.parseInt(user_id), asyncContext);
+				playerSessions.addNewContext(Integer.parseInt(user_id), asyncContext);
 			} catch (NumberFormatException | MultipleContextException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -121,15 +123,15 @@ public class AsyncServer extends HttpServlet {
 				}
 			});
 			try {
-				PlayerSessions.refresh(Integer.parseInt(user_id), asyncContext);
+				playerSessions.refresh(Integer.parseInt(user_id), asyncContext);
 				if(Matches.gotEnoughPlayers(Integer.parseInt(match_id))==true) {
 					List<Integer> l=Matches.getPlayerIds(Integer.parseInt(match_id));
 					for(int i=0;i<l.size();i++) {
-						PrintWriter pw=PlayerSessions.getContext(l.get(i)).getResponse().getWriter();
+						PrintWriter pw=playerSessions.getContext(l.get(i)).getResponse().getWriter();
 						pw.println("OK");
 						String s=new String(Base64.getEncoder().encode(Matches.sendHands(Integer.parseInt(match_id),i)),"utf-8").replace("\r\n", "");
 						pw.println(s);
-						PlayerSessions.getContext(l.get(i)).complete();
+						playerSessions.getContext(l.get(i)).complete();
 					}
 				}
 			} catch (NumberFormatException e) {

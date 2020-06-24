@@ -13,14 +13,14 @@ import exceptions.NoCorrespondingContextException;
  * 
  * */
 public class PlayerSessions {
-	static private final ConcurrentMap<Integer,AsyncContext> sessions=new ConcurrentHashMap<Integer,AsyncContext>();
+	private final ConcurrentMap<Integer,AsyncContext> sessions=new ConcurrentHashMap<Integer,AsyncContext>();
 	/**
 	 * Add new context to the mapping.Should always call after client connection
 	 * @param user_id The id of the client.
 	 * @param asyncContext The asynchronous context of the connection.
 	 * @throws MultipleContextException When key conflicts.
 	 * */
-	static public void addNewContext(Integer user_id,AsyncContext asyncContext) throws MultipleContextException {
+	public void addNewContext(Integer user_id,AsyncContext asyncContext) throws MultipleContextException {
 		sessions.put(user_id,asyncContext);
 		if(false) {
 			throw new MultipleContextException();
@@ -31,7 +31,7 @@ public class PlayerSessions {
 	 * @param user_id The user id of the expired connection.
 	 * @throws NoCorrespondingContextException 
 	 */
-	static public void delContext(Integer user_id) throws NoCorrespondingContextException {
+	public void delContext(Integer user_id) throws NoCorrespondingContextException {
 		
 		if(sessions.remove(user_id)==null) {
 			throw new NoCorrespondingContextException();
@@ -45,7 +45,7 @@ public class PlayerSessions {
 	 * @return The context to the given user_id.
 	 * @throws MultipleContextException When key conflicts.
 	 * */
-	static public void refresh(Integer user_id,AsyncContext asyncContext) throws NoCorrespondingContextException, MultipleContextException {
+	public void refresh(Integer user_id,AsyncContext asyncContext) throws NoCorrespondingContextException, MultipleContextException {
 		//delContext(user_id);
 		//addNewContext(user_id,asyncContext);
 		sessions.replace(user_id, asyncContext);
@@ -56,7 +56,7 @@ public class PlayerSessions {
 	 * @param user_id The id of user.
 	 * @return The AsyncContext of given user_id.
 	 * */
-	static public AsyncContext getContext(Integer user_id) throws NoCorrespondingContextException {
+	public AsyncContext getContext(Integer user_id) throws NoCorrespondingContextException {
 		AsyncContext tmp=null;
 		if((tmp=sessions.get(user_id))==null) {
 			throw new NoCorrespondingContextException();
