@@ -16,12 +16,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import ChatRoom.ChatRoom;
 import Services.AsyncListenerAdapter;
 import Services.Matches;
 import Services.PlayerSessions;
 import Services.Players;
 import Services.Rule;
+import chatRoom.chatRoom;
 import exceptions.MatchFullException;
 import exceptions.MatchNoFoundException;
 import exceptions.MultipleContextException;
@@ -54,7 +54,7 @@ public class AsyncServer extends HttpServlet {
 			int id=(int)ID.get();
 			Players.logIn(id);
 			PrintWriter pw=response.getWriter();
-			ChatRoom.joinChatRoom(id,0);
+		 	chatRoom.joinChatRoom(id,0);
 			pw.println("OK");
 			pw.print(id);
 			ID.incrementAndGet();
@@ -69,7 +69,7 @@ public class AsyncServer extends HttpServlet {
 			try {
 				Matches.joinGame(Integer.parseInt(match_id), Integer.parseInt(user_id));
 				PrintWriter pw=response.getWriter();
-				ChatRoom.joinChatRoom( Integer.parseInt(user_id),Integer.parseInt(match_id));
+				chatRoom.joinChatRoom( Integer.parseInt(user_id),Integer.parseInt(match_id));
 				pw.println("OK");
 				AsyncContext asyncContext=request.startAsync();
 				playerSessions.addNewContext(Integer.parseInt(user_id), asyncContext);
@@ -97,8 +97,8 @@ public class AsyncServer extends HttpServlet {
 			int s=Matches.createMatch(new Rule(1,2,0,true), Integer.parseInt(user_id));
 			AsyncContext asyncContext=request.startAsync();
 			PrintWriter pw=asyncContext.getResponse().getWriter();
-			ChatRoom.newChatRoom(s);
-			ChatRoom.joinChatRoom(Integer.parseInt(user_id),s);
+			chatRoom.newChatRoom(s);
+			chatRoom.joinChatRoom(Integer.parseInt(user_id),s);
 			pw.println("OK");
 			pw.println(s);
 			try {

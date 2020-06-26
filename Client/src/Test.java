@@ -155,7 +155,7 @@ public class Test {
 			netArgs2.put("match_id","0");
 			netArgs2.put("user_id",String.valueOf(user_id));
 			netArgs2.put("content","testing");
-			List<String>ret =ConnectionTools.doAction(netArgs,"ChatRoomServer");
+			List<String>ret =ConnectionTools.doAction(netArgs2,"ChatRoomServer");
 		}
 	}
 }

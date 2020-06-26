@@ -1,4 +1,4 @@
-package ChatRoom;
+package chatRoom;
 
 import java.io.IOException;
 import java.util.List;
@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import DealCards.AsyncServer;
 import Services.PlayerSessions;
+import exceptions.MultipleContextException;
 
 /**
  * Servlet implementation class chatRoomServer
@@ -41,11 +42,23 @@ public class ChatRoomServer extends HttpServlet {
 		if(action.equals("Spooling")) {
 		AsyncContext asyncContext=request.startAsync();
 		AsyncServer.asyncContextInitialize(5000,match_id,asyncContext);
+		String user_id=request.getParameter("user_id");
+		try {
+			playSessions.addNewContext(Integer.parseInt(user_id), asyncContext);
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MultipleContextException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		}else if(action.equals("Broadcast")){
 			match_id=String.valueOf(match_id);
 			String user_id=request.getParameter("user_id");
 			String s=user_id+":"+request.getParameter("content");
-			ChatRoom.broadcast(playSessions,s, match_id);
+			chatRoom.broadcast(playSessions,s, match_id);
+		}else if(action.equals("sign_in")) {
+			
 		}
 	}
 

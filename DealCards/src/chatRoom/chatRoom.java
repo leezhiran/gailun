@@ -1,4 +1,4 @@
-package ChatRoom;
+package chatRoom;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -12,10 +12,10 @@ import javax.servlet.AsyncContext;
 import Services.PlayerSessions;
 import exceptions.NoCorrespondingContextException;
 
-public class ChatRoom {
+public class chatRoom {
 	private int ChatRoomNo;
-    private static final ConcurrentMap<Integer,ChatRoom> chatRoomMapping=new ConcurrentHashMap<Integer,ChatRoom>();
-    static {chatRoomMapping.put(0,new ChatRoom(0));};
+    private static final ConcurrentMap<Integer,chatRoom> chatRoomMapping=new ConcurrentHashMap<Integer,chatRoom>();
+    static {chatRoomMapping.put(0,new chatRoom(0));};
 	private List<Integer> player_list=new LinkedList<Integer>();
 	public void check_in(int user_id) {
 		player_list.add(user_id);
@@ -23,7 +23,7 @@ public class ChatRoom {
 	public void check_out(int user_id) {
 		player_list.add(user_id);
 	}
-	public ChatRoom(int ChatRoomNo) {
+	public chatRoom(int ChatRoomNo) {
 		this.ChatRoomNo=ChatRoomNo;
 	}
 	public int getChatRoomNo() {
@@ -32,21 +32,16 @@ public class ChatRoom {
 	public void setChatRoomNo(int chatRoomNo) {
 		ChatRoomNo = chatRoomNo;
 	}
-	public void boradcast(PlayerSessions playerSessions,String s) throws NoCorrespondingContextException {
-		for(Integer i:player_list) {
-			AsyncContext asyncContext=playerSessions.getContext(i);
-			try {
-				PrintWriter pw=asyncContext.getResponse().getWriter();
-				pw.println(s);
-				asyncContext.complete();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+	public void boradcast(PlayerSessions playerSessions,String s) throws NoCorrespondingContextException, IOException {
+		for(Integer i=0;i<player_list.size();i++) {
+			AsyncContext asyncContext=playerSessions.getContext(player_list.get(i));
+			PrintWriter pw=asyncContext.getResponse().getWriter();
+			pw.println(s);
+			asyncContext.complete();
 		}
 	}
 	public static void newChatRoom(int no) {
-		chatRoomMapping.put(no,new ChatRoom(no));
+		chatRoomMapping.put(no,new chatRoom(no));
 	}
 	public static void destroyChatRoom(int no) {
 		chatRoomMapping.remove(no);
@@ -63,6 +58,9 @@ public class ChatRoom {
 		try {
 			chatRoomMapping.get(Integer.parseInt(chatRoom_id)).boradcast(playerSessions, str);
 		} catch (NumberFormatException | NoCorrespondingContextException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		};
