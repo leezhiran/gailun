@@ -55,7 +55,7 @@ public class ChatRoomServer extends HttpServlet {
 		}else if(action.equals("Broadcast")){
 			match_id=String.valueOf(match_id);
 			String user_id=request.getParameter("user_id");
-			String s=user_id+":"+request.getParameter("content");
+			String s=user_id+":"+request.getParameter("Content");
 			chatRoom.broadcast(playSessions,s, match_id);
 		}else if(action.equals("sign_in")) {
 			

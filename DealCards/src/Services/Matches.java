@@ -115,7 +115,11 @@ class Match{
 	@Override 
 	public String toString() {
 		String str=new String();
-		str+=String.valueOf(Match_id)+"\t"+String.valueOf(Player_ids.size())+"/"+Player_count;
+		str+=String.valueOf(Match_id)+" "+String.valueOf(Player_ids.size())+"/"+Player_count;
+		for(int i:Player_ids) {
+			str+=Players.getPlayer(i).toString();
+			str+='\n';
+		}
 		return str;
 	}
 }

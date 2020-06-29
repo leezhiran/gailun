@@ -94,7 +94,12 @@ public class AsyncServer extends HttpServlet {
 		}else if(act.equals("create_match")){
 			//For test, create a match with 1deck and 2 people
 			String user_id=request.getParameter("user_id");
-			int s=Matches.createMatch(new Rule(1,2,0,true), Integer.parseInt(user_id));
+			String player_count=request.getParameter("Player_count");
+			String Include_jokers=request.getParameter("Include_jokers");
+			String Deck_count=request.getParameter("Deck_count");
+			
+			Rule match_rule=new Rule(Integer.parseInt(Deck_count),Integer.parseInt(player_count),0,Boolean.parseBoolean(Include_jokers));
+			int s=Matches.createMatch(match_rule, Integer.parseInt(user_id));
 			AsyncContext asyncContext=request.startAsync();
 			PrintWriter pw=asyncContext.getResponse().getWriter();
 			chatRoom.newChatRoom(s);

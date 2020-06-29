@@ -17,4 +17,7 @@ public class Player{
 	public void joinGame(int match_id) throws MatchNoFoundException, MatchFullException {
 		Matches.joinGame(match_id,user_id);
 	}
+	public String toString() {
+		return String.valueOf(user_id);
+	}
 }
