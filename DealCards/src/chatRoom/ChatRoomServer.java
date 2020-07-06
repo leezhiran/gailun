@@ -41,7 +41,7 @@ public class ChatRoomServer extends HttpServlet {
 		String match_id=request.getParameter("match_id");
 		if(action.equals("Spooling")) {
 		AsyncContext asyncContext=request.startAsync();
-		AsyncServer.asyncContextInitialize(5000,match_id,asyncContext);
+		AsyncServer.asyncContextInitialize(5000,match_id,asyncContext,false);
 		String user_id=request.getParameter("user_id");
 		try {
 			playSessions.addNewContext(Integer.parseInt(user_id), asyncContext);

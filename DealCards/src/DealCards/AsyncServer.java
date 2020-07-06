@@ -119,7 +119,7 @@ public class AsyncServer extends HttpServlet {
 			String user_id=request.getParameter("user_id");
 			String match_id=request.getParameter("match_id");
 			AsyncContext asyncContext=request.startAsync();
-			asyncContextInitialize(5000,match_id,asyncContext);
+			asyncContextInitialize(5000,match_id,asyncContext,true);
 			mainTainSessions(user_id,match_id,asyncContext);
 		}		
 	}
@@ -138,7 +138,7 @@ public class AsyncServer extends HttpServlet {
 				List<Integer> l=Matches.getPlayerIds(Integer.parseInt(match_id));
 				for(int i=0;i<l.size();i++) {
 					PrintWriter pw=playerSessions.getContext(l.get(i)).getResponse().getWriter();
-					pw.println("OK");
+			 		pw.println("Dealt");
 					String s=new String(Base64.getEncoder().encode(Matches.sendHands(Integer.parseInt(match_id),i)),"utf-8").replace("\r\n", "");
 					pw.println(s);
 					playerSessions.getContext(l.get(i)).complete();
@@ -161,15 +161,16 @@ public class AsyncServer extends HttpServlet {
 			e.printStackTrace();
 		}
 	}
-	public static void asyncContextInitialize(int timeoutMilli,String match_id,AsyncContext asyncContext) {
+	public static void asyncContextInitialize(int timeoutMilli,String match_id,AsyncContext asyncContext,boolean ret) {
 		asyncContext.setTimeout(5000);
 		asyncContext.addListener(new AsyncListenerAdapter(){
 			@Override
 			public void onTimeout(AsyncEvent arg0) {
 				try {
 					PrintWriter pw= asyncContext.getResponse().getWriter();
-					pw.println("Spooling");
-					pw.print(Matches.getMatch(Integer.parseInt(match_id)));
+					pw.println("OK");
+					if(ret)
+						pw.print(Matches.getMatch(Integer.parseInt(match_id)));
 					asyncContext.complete();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block

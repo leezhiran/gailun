@@ -36,6 +36,7 @@ public class chatRoom {
 		for(Integer i=0;i<player_list.size();i++) {
 			AsyncContext asyncContext=playerSessions.getContext(player_list.get(i));
 			PrintWriter pw=asyncContext.getResponse().getWriter();
+			pw.println("OK");
 			pw.println(s);
 			asyncContext.complete();
 		}
