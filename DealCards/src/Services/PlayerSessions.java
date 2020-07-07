@@ -13,7 +13,7 @@ import exceptions.NoCorrespondingContextException;
  * 
  * */
 public class PlayerSessions {
-	private final ConcurrentMap<Integer,AsyncContext> sessions=new ConcurrentHashMap<Integer,AsyncContext>();
+	public final ConcurrentMap<Integer,AsyncContext> sessions=new ConcurrentHashMap<Integer,AsyncContext>();
 	/**
 	 * Add new context to the mapping.Should always call after client connection
 	 * @param user_id The id of the client.

@@ -102,8 +102,6 @@ public class AsyncServer extends HttpServlet {
 			int s=Matches.createMatch(match_rule, Integer.parseInt(user_id));
 			AsyncContext asyncContext=request.startAsync();
 			PrintWriter pw=asyncContext.getResponse().getWriter();
-			chatRoom.newChatRoom(s);
-			chatRoom.joinChatRoom(Integer.parseInt(user_id),s);
 			pw.println("OK");
 			pw.println(s);
 			try {
@@ -120,7 +118,7 @@ public class AsyncServer extends HttpServlet {
 			String match_id=request.getParameter("match_id");
 			AsyncContext asyncContext=request.startAsync();
 			asyncContextInitialize(5000,match_id,asyncContext,true);
-			mainTainSessions(user_id,match_id,asyncContext);
+			mainTainSessions(user_id,match_id,asyncContext,playerSessions);
 		}		
 	}
 
@@ -131,7 +129,7 @@ public class AsyncServer extends HttpServlet {
 		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
-	public void mainTainSessions(String user_id,String match_id,AsyncContext asyncContext) {
+	public void mainTainSessions(String user_id,String match_id,AsyncContext asyncContext,PlayerSessions playerSessions) {
 		try {
 			playerSessions.refresh(Integer.parseInt(user_id), asyncContext);
 			if(Matches.gotEnoughPlayers(Integer.parseInt(match_id))==true) {
